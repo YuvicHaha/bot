@@ -1,9 +1,24 @@
 import os
+import threading
 import discord
 from discord import app_commands
 import requests
+from flask import Flask
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 BRIDGE_URL = os.getenv("BRIDGE_URL")
+PORT = int(os.getenv("PORT", 3000))  # Default to 3000
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "🤖 Discord Bot is alive!"
+
+@app.route("/ping")
+def ping():
+    return "pong", 200
+
+def run_web():
+    app.run(host="0.0.0.0", port=PORT)
 class MyClient(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.default())
@@ -36,6 +51,5 @@ async def unfreeze(interaction: discord.Interaction, key: str):
             await interaction.response.send_message(f"❌ Key `{key}` not found.")
     except Exception as e:
         await interaction.response.send_message(f"⚠️ Error: {e}")
-
-# ✅ Start the bot
+threading.Thread(target=run_web).start()
 client.run(DISCORD_TOKEN)
