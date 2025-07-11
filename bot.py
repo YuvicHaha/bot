@@ -43,42 +43,45 @@ client = MyClient()
 @client.tree.command(name="freeze", description="Freeze a Roblox client by key")
 @app_commands.describe(key="The Roblox client's generated key")
 async def freeze(interaction: discord.Interaction, key: str):
+    await interaction.response.defer()
     try:
         res = requests.post(f"{BRIDGE_URL}/command", json={"key": key, "action": "freeze"})
         if res.status_code == 200:
-            await interaction.response.send_message(f"✅ Freeze sent to `{key}`")
+            await interaction.followup.send(f"✅ Freeze sent to `{key}`")
         else:
-            await interaction.response.send_message(f"❌ Key `{key}` not found.")
+            await interaction.followup.send(f"❌ Key `{key}` not found.")
     except Exception as e:
-        await interaction.response.send_message(f"⚠️ Error: {e}")
+        await interaction.followup.send(f"⚠️ Error: {e}")
 
 # 🔧 /unfreeze <key>
 @client.tree.command(name="unfreeze", description="Unfreeze a Roblox client by key")
 @app_commands.describe(key="The Roblox client's generated key")
 async def unfreeze(interaction: discord.Interaction, key: str):
+    await interaction.response.defer()
     try:
         res = requests.post(f"{BRIDGE_URL}/command", json={"key": key, "action": "unfreeze"})
         if res.status_code == 200:
-            await interaction.response.send_message(f"🧊 Unfreeze sent to `{key}`")
+            await interaction.followup.send(f"🧊 Unfreeze sent to `{key}`")
         else:
-            await interaction.response.send_message(f"❌ Key `{key}` not found.")
+            await interaction.followup.send(f"❌ Key `{key}` not found.")
     except Exception as e:
-        await interaction.response.send_message(f"⚠️ Error: {e}")
+        await interaction.followup.send(f"⚠️ Error: {e}")
 
 # 🔧 /kill [key]
 @client.tree.command(name="kill", description="Kill a specific client or all if no key is provided")
 @app_commands.describe(key="Optional client key to target (leave blank for all)")
 async def kill(interaction: discord.Interaction, key: str = None):
+    await interaction.response.defer()
     try:
         target = key or "all"
         res = requests.post(f"{BRIDGE_URL}/command", json={"key": target, "action": "kill"})
         if res.status_code == 200:
             msg = f"☠️ Kill sent to `{target}`" if key else "☠️ Kill sent to all clients."
-            await interaction.response.send_message(msg)
+            await interaction.followup.send(msg)
         else:
-            await interaction.response.send_message(f"❌ Failed to send kill to `{target}`")
+            await interaction.followup.send(f"❌ Failed to send kill to `{target}`")
     except Exception as e:
-        await interaction.response.send_message(f"⚠️ Error: {e}")
+        await interaction.followup.send(f"⚠️ Error: {e}")
 
 # 🔧 /kick <message> [key]
 @client.tree.command(name="kick", description="Kick a client (or all) with a message")
@@ -87,16 +90,17 @@ async def kill(interaction: discord.Interaction, key: str = None):
     key="Optional client key to target (leave blank for all)"
 )
 async def kick(interaction: discord.Interaction, message: str, key: str = None):
+    await interaction.response.defer()
     try:
         target = key or "all"
         res = requests.post(f"{BRIDGE_URL}/command", json={"key": target, "action": "kick", "message": message})
         if res.status_code == 200:
             msg = f"👢 Kick sent to `{target}`: {message}" if key else f"👢 Kick sent to all: {message}"
-            await interaction.response.send_message(msg)
+            await interaction.followup.send(msg)
         else:
-            await interaction.response.send_message(f"❌ Failed to send kick to `{target}`")
+            await interaction.followup.send(f"❌ Failed to send kick to `{target}`")
     except Exception as e:
-        await interaction.response.send_message(f"⚠️ Error: {e}")
+        await interaction.followup.send(f"⚠️ Error: {e}")
 
 # 🟢 Run the bot
 client.run(DISCORD_TOKEN)
